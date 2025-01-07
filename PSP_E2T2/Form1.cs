@@ -33,13 +33,10 @@ namespace PSP_E2T2
             else if (usuario == textBox1.Text && contraseña == textBox2.Text)
             {
                 MessageBox.Show($"¡Bienvenido, {usuario}!\nHas iniciado sesión correctamente.", "Inicio de sesión exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Form2 ZonaChat = new Form2();
+                this.Hide(); 
+                ZonaChat.ShowDialog(); // Mostrar el nuevo formulario como modal
 
-                // Mostrar el nuevo formulario
-                Form2 nuevoFormulario = new Form2();
-                this.Hide(); // Ocultar el formulario actual
-                nuevoFormulario.ShowDialog(); // Mostrar el nuevo formulario como modal
-
-                // Volver a mostrar Form1 si es necesario
                 this.Show();
             }
             else
