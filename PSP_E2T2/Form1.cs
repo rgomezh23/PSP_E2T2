@@ -1,47 +1,44 @@
+ï»¿using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+
 namespace PSP_E2T2
 {
     public partial class Form1 : Form
     {
+        // Lista para almacenar los nombres de los chats
+        private List<string> chats;
+
         public Form1()
         {
             InitializeComponent();
+            // Inicializar la lista de chats
+            chats = new List<string>();
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        // Este mÃ©todo se llama cuando se selecciona un chat del ComboBox
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Lógica que quieres ejecutar cuando el texto cambie en textBox1
+            // AquÃ­ puedes manejar lo que pasa cuando se selecciona un chat (por ejemplo, cargar el contenido del chat)
         }
 
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-            // Lógica que quieres ejecutar cuando el texto cambie en textBox1
-        }
-
+        // Este mÃ©todo se llama cuando se hace clic en el botÃ³n "Nuevo Chat"
         private void button1_Click(object sender, EventArgs e)
         {
-            string usuario = "prueba";
-            string contraseña = "1234";
+            // Puedes solicitar un nombre para el nuevo chat
+            string nuevoChat = Microsoft.VisualBasic.Interaction.InputBox("Ingrese el nombre del nuevo chat:", "Nuevo Chat");
 
-            if (string.IsNullOrEmpty(textBox1.Text))
+            if (!string.IsNullOrEmpty(nuevoChat))
             {
-                MessageBox.Show("Por favor, introduce tu nombre de usuario para continuar.", "Usuario requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            else if (string.IsNullOrEmpty(textBox2.Text))
-            {
-                MessageBox.Show("Por favor, introduce tu contraseña para continuar.", "Contraseña requerida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            else if (usuario == textBox1.Text && contraseña == textBox2.Text)
-            {
-                MessageBox.Show($"¡Bienvenido, {usuario}!\nHas iniciado sesión correctamente.", "Inicio de sesión exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Form2 ZonaChat = new Form2();
-                this.Hide(); 
-                ZonaChat.ShowDialog(); // Mostrar el nuevo formulario como modal
+                chats.Add(nuevoChat);
 
-                this.Show();
+                comboBox1.Items.Add(nuevoChat);
+                
+                comboBox1.SelectedItem = nuevoChat;
             }
             else
             {
-                MessageBox.Show("El nombre de usuario o la contraseña que ingresaste no son correctos. Por favor, verifica tus datos e inténtalo nuevamente.", "Error de inicio de sesión", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("El nombre del chat no puede estar vacÃ­o.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

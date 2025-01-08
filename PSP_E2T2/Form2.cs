@@ -6,40 +6,31 @@ namespace PSP_E2T2
 {
     public partial class Form2 : Form
     {
-        // Lista para almacenar los nombres de los chats
-        private List<string> chats;
+        // Lista para almacenar los mensajes (simulando un chat)
+        private List<string> mensajes;
 
         public Form2()
         {
             InitializeComponent();
-            // Inicializar la lista de chats
-            chats = new List<string>();
+            mensajes = new List<string>();  // Lista para los mensajes
         }
 
-        // Este método se llama cuando se selecciona un chat del ComboBox
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // Aquí puedes manejar lo que pasa cuando se selecciona un chat (por ejemplo, cargar el contenido del chat)
-        }
-
-        // Este método se llama cuando se hace clic en el botón "Nuevo Chat"
+        // Evento de clic en el botón de enviar mensaje
         private void button1_Click(object sender, EventArgs e)
         {
-            // Puedes solicitar un nombre para el nuevo chat
-            string nuevoChat = Microsoft.VisualBasic.Interaction.InputBox("Ingrese el nombre del nuevo chat:", "Nuevo Chat");
+            //string mensaje = textBox2.Text.Trim();
+            
+            //if (!string.IsNullOrEmpty(mensaje))
+            //{
+            //    // Agregar el mensaje a la lista de mensajes
+            //    mensajes.Add("Tú: " + mensaje);
 
-            if (!string.IsNullOrEmpty(nuevoChat))
-            {
-                chats.Add(nuevoChat);
+            //    // Mostrar los mensajes en el TextBox (historial de chat)
+            //    //textBox1.Text = string.Join(Environment.NewLine, mensajes);
 
-                comboBox1.Items.Add(nuevoChat);
-                
-                comboBox1.SelectedItem = nuevoChat;
-            }
-            else
-            {
-                MessageBox.Show("El nombre del chat no puede estar vacío.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            //    // Limpiar el TextBox donde el usuario escribe
+            //    //textBox2.Clear();
+            //}
         }
     }
 }
