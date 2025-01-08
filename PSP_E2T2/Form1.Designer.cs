@@ -31,13 +31,14 @@
             comboBox1 = new ComboBox();
             label1 = new Label();
             button1 = new Button();
+            button2 = new Button();
             SuspendLayout();
             // 
             // comboBox1
             // 
             comboBox1.FormattingEnabled = true;
             comboBox1.Location = new Point(-1, -1);
-            comboBox1.Margin = new Padding(2, 2, 2, 2);
+            comboBox1.Margin = new Padding(2);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(129, 23);
             comboBox1.TabIndex = 0;
@@ -60,7 +61,7 @@
             // 
             button1.Font = new Font("Segoe UI", 12F);
             button1.Location = new Point(314, 143);
-            button1.Margin = new Padding(2, 2, 2, 2);
+            button1.Margin = new Padding(2);
             button1.Name = "button1";
             button1.Size = new Size(164, 49);
             button1.TabIndex = 2;
@@ -68,15 +69,28 @@
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
+            // button2
+            // 
+            button2.Font = new Font("Segoe UI", 12F);
+            button2.Location = new Point(314, 235);
+            button2.Margin = new Padding(2);
+            button2.Name = "button2";
+            button2.Size = new Size(164, 49);
+            button2.TabIndex = 3;
+            button2.Text = "Salir";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(label1);
             Controls.Add(comboBox1);
-            Margin = new Padding(2, 2, 2, 2);
+            Margin = new Padding(2);
             Name = "Form1";
             Text = "Chats";
             ResumeLayout(false);
@@ -88,5 +102,6 @@
         private ComboBox comboBox1;
         private Label label1;
         private Button button1;
+        private Button button2;
     }
 }

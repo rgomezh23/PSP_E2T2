@@ -8,7 +8,7 @@ namespace PSP_E2T2
     {
         private Form1 form1; 
         private List<string> mensajes;
-
+         
         public Form2(Form1 form1)
         {
             InitializeComponent();
@@ -21,7 +21,7 @@ namespace PSP_E2T2
         
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
             // form1 originala
             form1.Show();
