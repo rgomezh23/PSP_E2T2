@@ -6,22 +6,31 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Windows.Forms;
+using static System.Windows.Forms.DataFormats;
 
 namespace PSP_E2T2
 {
     public partial class Form1 : Form
     {
-        private List<string> chats;
+        private List<string> chats = new List<string>();
+        public List<string> erabiltzaileak = new List<string>();
+
         private Dictionary<string, string> chatIPs;
+
+
         // Bezero socket-a.
-        TcpClient client = null;
+        public TcpClient client = null;
 
-        NetworkStream str = null;
+        public NetworkStream str = null;
 
-        StreamReader sr = null;
-        StreamWriter sw = null;
+        public StreamReader sr = null;
+        public StreamWriter sw = null;
 
         private ProgramServer server;
+
+        private Form2 form2;
+
+        private bool isConnected = false;
 
         public Form1()
         {
@@ -67,29 +76,43 @@ namespace PSP_E2T2
             }
         }
 
+        public void AddErabiltzaile(string izena)
+        {
+            string ip = GetLocalIPAddress();
+
+            if (erabiltzaileak.Contains(izena))
+            {
+                MessageBox.Show("Izena hori beste erabiltzaile du. Ipini beste bat.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (!string.IsNullOrEmpty(izena) && !chats.Contains(izena))
+            {
+                erabiltzaileak.Add(izena);
+                chatIPs[izena] = ip; // Asocia el chat con la IP
+            }
+        }
+
         private async void ConnectToServer()
         {
+            if (isConnected)
+            {
+                MessageBox.Show("Ya estás conectado al servidor.", "Conexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             try
             {
-                if (client != null && client.Connected)
-                {
-                    MessageBox.Show("Ya estás conectado al servidor.", "Conexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
+                // Configuración de conexión
+                string serverAddress = "192.168.202.33";
+                int serverPort = 13000;
 
-                // Asegúrate de que el servidor esté activo antes de conectar
-                string serverAddress = "192.168.202.33"; // Dirección IP del servidor
-                int serverPort = 13000; // Puerto del servidor
-
-                // Conectar el cliente al servidor
                 client = new TcpClient();
                 await client.ConnectAsync(serverAddress, serverPort);
 
-                // Inicializar StreamReader y StreamWriter para leer y escribir mensajes
-                NetworkStream stream = client.GetStream();
-                sr = new StreamReader(stream, Encoding.UTF8);
-                sw = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
+                str = client.GetStream();
+                sr = new StreamReader(str, Encoding.UTF8);
+                sw = new StreamWriter(str, Encoding.UTF8) { AutoFlush = true };
 
+                isConnected = true;
                 MessageBox.Show("Conexión establecida con el servidor.", "Conexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
@@ -105,27 +128,64 @@ namespace PSP_E2T2
 
             MessageBox.Show($"Has seleccionado el chat: {selectedChat}\nIP: {ip}", "Chat Seleccionado");
 
-            // Abre un nuevo formulario con la información del chat
-            Form2 form2 = new Form2(this);
-            form2.Show();
+            if (form2 == null || form2.IsDisposed)
+            {
+                form2 = new Form2(this);
+                form2.Show();
+            }
+            else
+            {
+                form2.Focus();
+            }
+
             this.Hide();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            // Solicitar nombre del nuevo chat
             string nuevoChat = Microsoft.VisualBasic.Interaction.InputBox("Ingrese el nombre del nuevo chat:", "Nuevo Chat");
 
             if (!string.IsNullOrEmpty(nuevoChat))
             {
+                comboBox1.SelectedIndexChanged -= comboBox1_SelectedIndexChanged; // Desactivar el evento
                 AddChat(nuevoChat);
                 comboBox1.SelectedItem = nuevoChat;
-                ConnectToServer();
+                comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged; // Reactivar el evento
             }
             else
             {
                 MessageBox.Show("El nombre del chat no puede estar vacío.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Solicitar el nombre del usuario
+            string izena = Microsoft.VisualBasic.Interaction.InputBox("Sartu zure izena:", "Izena");
+
+            if (!string.IsNullOrEmpty(izena))
+            {
+                AddErabiltzaile(izena);
+                ConnectToServer(); // Intentar conectar al servidor
+
+                // Mostrar el formulario Form2 después de agregar el usuario
+                if (form2 == null || form2.IsDisposed)
+                {
+                    form2 = new Form2(this);
+                    form2.Show();
+                }
+                else
+                {
+                    form2.Focus();
+                }
+
+                this.Hide(); // Ocultar el formulario actual
+            }
+            else
+            {
+                MessageBox.Show("Izena ezin da hutsik egon.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private async void button2_Click(object sender, EventArgs e)
         {
