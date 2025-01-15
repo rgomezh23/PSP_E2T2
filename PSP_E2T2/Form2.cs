@@ -1,84 +1,63 @@
-﻿using Microsoft.VisualBasic.Devices;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using static System.Windows.Forms.DataFormats;
-
-namespace PSP_E2T2
+﻿namespace PSP_E2T2
 {
     public partial class Form2 : Form
     {
-        private Form1 form1; 
-        private List<string> mensajes;
-
+        private Form1 form1;
 
         public Form2(Form1 form1)
         {
             InitializeComponent();
-            this.form1 = form1; 
-            mensajes = new List<string>();
+            this.form1 = form1;
+
+            // Suscribirse al evento OnMessageReceived de Form1
+            this.form1.OnMessageReceived += Form1_OnMessageReceived;
         }
 
-        public async void ReceiveMessages()
+        // Método que maneja los mensajes recibidos desde Form1
+        private void Form1_OnMessageReceived(string mensaje)
         {
-            try
+            // Agregar el mensaje al richTextBox1 en el hilo de UI
+            richTextBox1.Invoke((MethodInvoker)(() =>
             {
-                while (true)
-                {
-                    // Leer el mensaje del servidor
-                    string mensaje = await form1.sr.ReadLineAsync();
+                richTextBox1.AppendText(mensaje + "\n");
+            }));
+        }
 
-                    if (!string.IsNullOrEmpty(mensaje))
-                    {
-                        // Agregar el mensaje al richTextBox1
-                        richTextBox1.Invoke((MethodInvoker)(() =>
-                        {
-                            richTextBox1.AppendText(mensaje + "\n");
-                        }));
-                    }
+        // Evento para enviar un mensaje cuando se presiona el botón
+        private async void button1_Click_1(object sender, EventArgs e)
+        {
+            if (form1.erabiltzaileak.Count > 0)
+            {
+                string izena = form1.erabiltzaileak[form1.erabiltzaileak.Count - 1]; // Último usuario agregado
+                string mensaje = $"{izena}: {richTextBox2.Text}";
+
+                try
+                {
+                    // Enviar el mensaje al servidor
+                    await form1.sw.WriteLineAsync(mensaje);
+
+                    // Mostrar el mensaje en el propio chat
+                    richTextBox1.AppendText(mensaje + "\n");
+
+                    // Limpiar el contenido de richTextBox2
+                    richTextBox2.Clear();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al enviar el mensaje: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error al recibir mensajes: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("No hay usuarios registrados para enviar mensajes.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
-        private async void button1_Click_1(object sender, EventArgs e)
-{
-        if (string.IsNullOrWhiteSpace(richTextBox2.Text))
-        {
-            MessageBox.Show("El mensaje no puede estar vacío.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-
-        // Obtener el nombre del usuario
-        int listaTamaina = form1.erabiltzaileak.Count;
-        string izena = form1.erabiltzaileak[listaTamaina - 1]; // Último usuario agregado
-        string mensaje = $"{izena}: {richTextBox2.Text}";
-
-        try
-        {
-            // Enviar el mensaje al servidor
-            await form1.sw.WriteLineAsync(mensaje);
-
-            // Mostrar el mensaje en el propio chat
-            richTextBox1.AppendText(mensaje + "\n");
-
-            // Limpiar el contenido de richTextBox2
-            richTextBox2.Clear();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error al enviar el mensaje: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
+        // Evento para regresar al Form1
         private async void button2_Click(object sender, EventArgs e)
         {
-            // form1 originala
+            // Mostrar form1
             form1.Show();
-
             this.Hide();
         }
     }

@@ -1,24 +1,14 @@
-﻿using PraktikaIndibiduala;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using TxatServer;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Windows.Forms;
-using static System.Windows.Forms.DataFormats;
 
 namespace PSP_E2T2
 {
     public partial class Form1 : Form
     {
-        private List<string> chats = new List<string>();
         public List<string> erabiltzaileak = new List<string>();
 
-        private Dictionary<string, string> chatIPs;
-
-
-        // Bezero socket-a.
         public TcpClient client = null;
 
         public NetworkStream str = null;
@@ -32,11 +22,12 @@ namespace PSP_E2T2
 
         private bool isConnected = false;
 
+        public event Action<string> OnMessageReceived;
+
         public Form1()
         {
             InitializeComponent();
-            chats = new List<string>();
-            chatIPs = new Dictionary<string, string>();
+            erabiltzaileak = new List<string>();
         }
 
         // Método para obtener la IP local del dispositivo
@@ -64,18 +55,6 @@ namespace PSP_E2T2
             return localIP;
         }
 
-        public void AddChat(string chat)
-        {
-            string ip = GetLocalIPAddress();
-
-            if (!string.IsNullOrEmpty(chat) && !chats.Contains(chat))
-            {
-                chats.Add(chat);
-                chatIPs[chat] = ip; // Asocia el chat con la IP
-                comboBox1.Items.Add(chat);
-            }
-        }
-
         public void AddErabiltzaile(string izena)
         {
             string ip = GetLocalIPAddress();
@@ -84,13 +63,32 @@ namespace PSP_E2T2
             {
                 MessageBox.Show("Izena hori beste erabiltzaile du. Ipini beste bat.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            else if (!string.IsNullOrEmpty(izena) && !chats.Contains(izena))
+            else if (!string.IsNullOrEmpty(izena))
             {
                 erabiltzaileak.Add(izena);
-                chatIPs[izena] = ip; // Asocia el chat con la IP
             }
         }
 
+        // Método para recibir mensajes del servidor
+       
+        private async Task ListenForServerMessages()
+        {
+            try
+            {
+                string message;
+                while ((message = await sr.ReadLineAsync()) != null)
+                {
+                    // Dispara el evento cuando se recibe un mensaje
+                    OnMessageReceived?.Invoke(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al recibir mensajes del servidor: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // Llamar a este método en el `ConnectToServer` después de que el cliente se conecte
         private async void ConnectToServer()
         {
             if (isConnected)
@@ -102,7 +100,7 @@ namespace PSP_E2T2
             try
             {
                 // Configuración de conexión
-                string serverAddress = "192.168.202.33";
+                string serverAddress = "192.168.1.129";
                 int serverPort = 13000;
 
                 client = new TcpClient();
@@ -111,6 +109,9 @@ namespace PSP_E2T2
                 str = client.GetStream();
                 sr = new StreamReader(str, Encoding.UTF8);
                 sw = new StreamWriter(str, Encoding.UTF8) { AutoFlush = true };
+
+                // Iniciar el proceso de escucha de mensajes del servidor
+                _ = ListenForServerMessages();
 
                 isConnected = true;
                 MessageBox.Show("Conexión establecida con el servidor.", "Conexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -121,44 +122,8 @@ namespace PSP_E2T2
             }
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
-            string selectedChat = comboBox1.SelectedItem.ToString();
-            string ip = chatIPs.ContainsKey(selectedChat) ? chatIPs[selectedChat] : "IP desconocida";
-
-            MessageBox.Show($"Has seleccionado el chat: {selectedChat}\nIP: {ip}", "Chat Seleccionado");
-
-            if (form2 == null || form2.IsDisposed)
-            {
-                form2 = new Form2(this);
-                form2.Show();
-            }
-            else
-            {
-                form2.Focus();
-            }
-
-            this.Hide();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            // Solicitar nombre del nuevo chat
-            string nuevoChat = Microsoft.VisualBasic.Interaction.InputBox("Ingrese el nombre del nuevo chat:", "Nuevo Chat");
-
-            if (!string.IsNullOrEmpty(nuevoChat))
-            {
-                comboBox1.SelectedIndexChanged -= comboBox1_SelectedIndexChanged; // Desactivar el evento
-                AddChat(nuevoChat);
-                comboBox1.SelectedItem = nuevoChat;
-                comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged; // Reactivar el evento
-            }
-            else
-            {
-                MessageBox.Show("El nombre del chat no puede estar vacío.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
             // Solicitar el nombre del usuario
             string izena = Microsoft.VisualBasic.Interaction.InputBox("Sartu zure izena:", "Izena");
 
@@ -170,7 +135,7 @@ namespace PSP_E2T2
                 // Mostrar el formulario Form2 después de agregar el usuario
                 if (form2 == null || form2.IsDisposed)
                 {
-                    form2 = new Form2(this);
+                    form2 = new Form2(this); // Pasar Form1 como parámetro
                     form2.Show();
                 }
                 else
