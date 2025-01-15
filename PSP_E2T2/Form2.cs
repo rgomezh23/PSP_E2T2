@@ -16,12 +16,17 @@
         // Método que maneja los mensajes recibidos desde Form1
         private void Form1_OnMessageReceived(string mensaje)
         {
-            // Agregar el mensaje al richTextBox1 en el hilo de UI
+            // Mostrar el mensaje solo si es sobre la unión de un cliente o un mensaje enviado en el chat
             richTextBox1.Invoke((MethodInvoker)(() =>
             {
-                richTextBox1.AppendText(mensaje + "\n");
+                // Solo mostrar si contiene "se ha unido" o un mensaje de chat
+                if (mensaje.Contains("se ha unido") || mensaje.Contains(":"))
+                {
+                    richTextBox1.AppendText(mensaje + "\n");
+                }
             }));
         }
+
 
         // Evento para enviar un mensaje cuando se presiona el botón
         private async void button1_Click_1(object sender, EventArgs e)
@@ -52,6 +57,7 @@
                 MessageBox.Show("No hay usuarios registrados para enviar mensajes.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
 
         // Evento para regresar al Form1
         private async void button2_Click(object sender, EventArgs e)

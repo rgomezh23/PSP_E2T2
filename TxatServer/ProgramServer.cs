@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Text;
 
 namespace TxatServer
@@ -11,7 +10,6 @@ namespace TxatServer
         private readonly int port = 13000; // Puerto del servidor
         private IPAddress localAddr; // Dirección IP del servidor
         private TcpListener server; // Listener del servidor
-        private ConcurrentDictionary<string, List<TcpClient>> chatsActivos = new ConcurrentDictionary<string, List<TcpClient>>(); // Chats activos
         private ConcurrentDictionary<string, TcpClient> clientesActivos = new ConcurrentDictionary<string, TcpClient>(); // Clientes activos
         private bool isRunning = true; // Control del bucle del servidor
         public event Action<string> OnNewMessageReceived;
@@ -81,45 +79,28 @@ namespace TxatServer
                 using var reader = new StreamReader(stream, Encoding.UTF8);
                 var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
 
-                // Enviar lista de chats activos al cliente
-                await SendChatListToClient(writer);
+                // Enviar mensaje de bienvenida al cliente
+                await writer.WriteLineAsync("Bienvenido al chat!");
 
                 string message;
-                string erantzuna;
-                string clientChat = null;
-
                 // Leer mensajes del cliente
                 while ((message = await reader.ReadLineAsync()) != null)
                 {
                     Console.WriteLine($"Mensaje recibido de {clientId}: {message}");
-                    erantzuna = "BIDALITA";
-
-                    if (erantzuna.ToUpper() == "BIDALITA")
-                    {
-                        await writer.WriteLineAsync(erantzuna);
-                    }
 
                     // Si el mensaje es "ATERA", desconectar el cliente
                     if (message.ToUpper() == "ATERA")
                     {
                         Console.WriteLine($"Cliente {clientId} se ha desconectado.");
+                        await writer.WriteLineAsync($"Cliente {clientId} se ha desconectado.");
                         break;
                     }
 
-                    // Si el cliente no está en un chat, lo asignamos a uno
-                    if (clientChat == null)
-                    {
-                        clientChat = message; // El primer mensaje del cliente es el chat al que quiere unirse
-                        await AddClientToChat(clientChat, client, writer);
-                    }
-                    else
-                    {
-                        // Aquí, haces el broadcast de mensaje a todos los clientes
-                        await BroadcastMessageToChat(clientChat, $"{clientId}: {message}");
+                    // Broadcast del mensaje a todos los clientes conectados excepto al que lo envió
+                    await BroadcastMessageToAllClients(clientId, $"{message}");
 
-                        // Dispara el evento para enviar el mensaje a Form2 (cliente)
-                        OnNewMessageReceived?.Invoke($"{clientId}: {message}");
-                    }
+                    // Dispara el evento para enviar el mensaje a Form2 (cliente)
+                    OnNewMessageReceived?.Invoke($"{clientId}: {message}");
                 }
             }
             catch (IOException)
@@ -138,92 +119,25 @@ namespace TxatServer
                 Console.WriteLine($"Cliente desconectado: {clientId}");
             }
         }
-        private async Task SendChatListToClient(StreamWriter writer)
-        {
-            try
-            {
-                // Enviar la lista de chats activos a un cliente
-                var chatList = string.Join(",", chatsActivos.Keys);
-                await writer.WriteLineAsync($"Chats disponibles: {chatList}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error enviando lista de chats: {ex.Message}");
-            }
-        }
 
-        // Método para agregar un cliente al chat
-        private async Task AddClientToChat(string chatName, TcpClient client, StreamWriter writer)
-        {
-            try
-            {
-                // Verificar si el chat no existe, y crearlo si es necesario
-                if (!chatsActivos.ContainsKey(chatName))
-                {
-                    // Crear un nuevo chat si no existe
-                    chatsActivos[chatName] = new List<TcpClient>();
-                    Console.WriteLine($"Nuevo chat creado: {chatName}");
-
-                }
-
-                // Agregar el cliente al chat
-                chatsActivos[chatName].Add(client);
-                Console.WriteLine($"Cliente agregado al chat: {chatName}");
-
-                // Notificar a todos los miembros del chat sobre el nuevo cliente
-                await BroadcastMessageToChat(chatName, $"{client.Client.RemoteEndPoint} se ha unido al chat {chatName}");
-
-                // Enviar el historial de mensajes al nuevo cliente (si existe)
-                await SendChatHistoryToClient(writer, chatName);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error agregando cliente al chat: {ex.Message}");
-            }
-        }
-
-
-        private async Task BroadcastMessageToChat(string chatId, string message)
+        private async Task BroadcastMessageToAllClients(string clientId, string message)
         {
             // Iterar sobre todos los clientes conectados y enviarles el mensaje
             foreach (var client in clientesActivos.Values)
             {
                 try
                 {
-                    var writer = new StreamWriter(client.GetStream(), Encoding.UTF8) { AutoFlush = true };
-                    await writer.WriteLineAsync(message);
+                    // Verificar si el cliente es el que está enviando el mensaje
+                    if (client.Client.RemoteEndPoint.ToString() != clientId)
+                    {
+                        var writer = new StreamWriter(client.GetStream(), Encoding.UTF8) { AutoFlush = true };
+                        await writer.WriteLineAsync(message);
+                    }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error al enviar mensaje a cliente: {ex.Message}");
                 }
-            }
-        }
-
-
-        private async Task SendChatHistoryToClient(StreamWriter writer, string chatName)
-        {
-            try
-            {
-                // Enviar el historial de mensajes al cliente
-                if (chatsActivos.ContainsKey(chatName))
-                {
-                    foreach (var client in chatsActivos[chatName])
-                    {
-                        // Asegurarnos de que el cliente reciba el historial
-                        var chatHistory = "== Historial de mensajes ==";
-                        foreach (var msg in chatsActivos[chatName])
-                        {
-                            chatHistory += msg;
-                        }
-
-                        await writer.WriteLineAsync(chatHistory);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error enviando historial al cliente: {ex.Message}");
             }
         }
 
