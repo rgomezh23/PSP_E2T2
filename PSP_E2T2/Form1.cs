@@ -100,7 +100,7 @@ namespace PSP_E2T2
             try
             {
                 // Configuración de conexión
-                string serverAddress = "192.168.1.129";
+                string serverAddress = GetLocalIPAddress();
                 int serverPort = 13000;
 
                 client = new TcpClient();

@@ -4,6 +4,7 @@
     {
         private Form1 form1;
 
+
         public Form2(Form1 form1)
         {
             InitializeComponent();
@@ -65,6 +66,23 @@
             // Mostrar form1
             form1.Show();
             this.Hide();
+            
+        }
+
+        private void richTextBox2_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true; // Bloquea el procesamiento de la tecla Enter
+            }
+        }
+
+        private void richTextBox2_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true; // Anula el evento para evitar el salto de línea
+            }
         }
     }
 }

@@ -39,29 +39,27 @@
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 48F);
-            label1.Location = new Point(426, -20);
-            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Location = new Point(298, -12);
             label1.Name = "label1";
-            label1.Size = new Size(249, 128);
+            label1.Size = new Size(168, 86);
             label1.TabIndex = 0;
             label1.Text = "Chat";
             // 
             // richTextBox1
             // 
-            richTextBox1.Location = new Point(17, 105);
-            richTextBox1.Margin = new Padding(4, 5, 4, 5);
+            richTextBox1.Location = new Point(12, 63);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(1107, 521);
+            richTextBox1.ReadOnly = true;
+            richTextBox1.Size = new Size(776, 314);
             richTextBox1.TabIndex = 1;
             richTextBox1.Text = "";
             // 
             // button1
             // 
             button1.Font = new Font("Segoe UI", 12F);
-            button1.Location = new Point(943, 662);
-            button1.Margin = new Padding(4, 5, 4, 5);
+            button1.Location = new Point(660, 397);
             button1.Name = "button1";
-            button1.Size = new Size(183, 68);
+            button1.Size = new Size(128, 41);
             button1.TabIndex = 2;
             button1.Text = "Textua bidali";
             button1.UseVisualStyleBackColor = true;
@@ -70,10 +68,9 @@
             // button2
             // 
             button2.Font = new Font("Segoe UI", 12F);
-            button2.Location = new Point(1014, 31);
-            button2.Margin = new Padding(4, 5, 4, 5);
+            button2.Location = new Point(710, 19);
             button2.Name = "button2";
-            button2.Size = new Size(112, 51);
+            button2.Size = new Size(78, 31);
             button2.TabIndex = 3;
             button2.Text = "Bueltatu";
             button2.UseVisualStyleBackColor = true;
@@ -81,23 +78,25 @@
             // 
             // richTextBox2
             // 
-            richTextBox2.Location = new Point(17, 662);
-            richTextBox2.Margin = new Padding(4, 5, 4, 5);
+            richTextBox2.Location = new Point(12, 397);
             richTextBox2.Name = "richTextBox2";
-            richTextBox2.Size = new Size(915, 66);
+            richTextBox2.Size = new Size(642, 41);
             richTextBox2.TabIndex = 4;
             richTextBox2.Text = "";
+            richTextBox2.KeyDown += richTextBox2_KeyDown;
+            richTextBox2.KeyPress += richTextBox2_KeyPress;
             // 
             // Form2
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1143, 750);
+            ClientSize = new Size(800, 450);
             Controls.Add(richTextBox2);
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(richTextBox1);
             Controls.Add(label1);
+            Margin = new Padding(2);
             Name = "Form2";
             Text = "Escribir chats";
             ResumeLayout(false);
