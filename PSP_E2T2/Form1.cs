@@ -30,6 +30,25 @@ namespace PSP_E2T2
             erabiltzaileak = new List<string>();
         }
 
+        public bool getConnected() {
+            return isConnected;
+        }
+
+        public StreamReader getStreamReader()
+        {
+            return sr;
+        }
+
+        public StreamWriter getStreamWriter()
+        {
+            return sw;
+        }
+
+        public TcpClient GetClient()
+        {
+            return client;
+        }
+
         // Método para obtener la IP local del dispositivo
         private string GetLocalIPAddress()
         {
@@ -154,24 +173,7 @@ namespace PSP_E2T2
 
         private async void button2_Click(object sender, EventArgs e)
         {
-            if (client != null && client.Connected)
-            {
-                MessageBox.Show("Enviando mensaje de desconexión...", "Desconexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // Enviar el mensaje de desconexión al servidor
-                await sw.WriteLineAsync("ATERA");
-
-                // Cerrar los streams y el cliente
-                sw.Close();
-                sr.Close();
-                client.Close();
-
-                MessageBox.Show("Cliente desconectado.", "Desconexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                MessageBox.Show("No hay cliente conectado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            MessageBox.Show("Programa amatatzen.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             // Salir de la aplicación
             Application.Exit();

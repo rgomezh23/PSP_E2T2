@@ -1,8 +1,17 @@
-﻿namespace PSP_E2T2
+﻿using System.Net.Sockets;
+
+namespace PSP_E2T2
 {
     public partial class Form2 : Form
     {
         private Form1 form1;
+
+        public TcpClient client = null;
+
+        public NetworkStream str = null;
+
+        public StreamReader sr = null;
+        public StreamWriter sw = null;
 
 
         public Form2(Form1 form1)
@@ -66,7 +75,33 @@
             // Mostrar form1
             form1.Show();
             this.Hide();
-            
+
+
+            bool connected = form1.getConnected();
+            client = form1.GetClient();
+            sr = form1.getStreamReader();
+            sw = form1.getStreamWriter();
+
+            if (client != null && connected)
+            {
+                MessageBox.Show("Enviando mensaje de desconexión...", "Desconexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Enviar el mensaje de desconexión al servidor
+                await sw.WriteLineAsync("ATERA");
+                await Task.Delay(100);
+
+                // Cerrar los streams y el cliente
+                sw.Close();
+                sr.Close();
+                client.Close();
+
+                MessageBox.Show("Cliente desconectado.", "Desconexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("No hay cliente conectado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
         }
 
         private void richTextBox2_KeyDown(object sender, KeyEventArgs e)
