@@ -38,9 +38,10 @@
             label1.Anchor = AnchorStyles.None;
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 48F);
-            label1.Location = new Point(226, -2);
+            label1.Location = new Point(158, -1);
+            label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
-            label1.Size = new Size(764, 128);
+            label1.Size = new Size(512, 86);
             label1.TabIndex = 1;
             label1.Text = "ZONA DE CHATS";
             label1.TextAlign = ContentAlignment.TopCenter;
@@ -48,20 +49,22 @@
             // button1
             // 
             button1.Font = new Font("Segoe UI", 12F);
-            button1.Location = new Point(449, 238);
+            button1.Location = new Point(314, 143);
+            button1.Margin = new Padding(2, 2, 2, 2);
             button1.Name = "button1";
-            button1.Size = new Size(234, 82);
+            button1.Size = new Size(164, 49);
             button1.TabIndex = 2;
-            button1.Text = "Unirse a chat";
+            button1.Text = "Unirse al chat";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
             // button2
             // 
             button2.Font = new Font("Segoe UI", 12F);
-            button2.Location = new Point(449, 392);
+            button2.Location = new Point(314, 235);
+            button2.Margin = new Padding(2, 2, 2, 2);
             button2.Name = "button2";
-            button2.Size = new Size(234, 82);
+            button2.Size = new Size(164, 49);
             button2.TabIndex = 3;
             button2.Text = "Salir";
             button2.UseVisualStyleBackColor = true;
@@ -69,12 +72,13 @@
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1143, 750);
+            ClientSize = new Size(800, 450);
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(label1);
+            Margin = new Padding(2, 2, 2, 2);
             Name = "Form1";
             Text = "Chats";
             ResumeLayout(false);

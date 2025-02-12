@@ -4,57 +4,53 @@ namespace PSP_E2T2
 {
     public partial class Form2 : Form
     {
+        // Aldagaiak sortuko ditugu, gero erabili ahal izateko.
         private Form1 form1;
-
         public TcpClient client = null;
-
         public NetworkStream str = null;
-
         public StreamReader sr = null;
         public StreamWriter sw = null;
-
 
         public Form2(Form1 form1)
         {
             InitializeComponent();
             this.form1 = form1;
 
-            // Suscribirse al evento OnMessageReceived de Form1
+            // OnMessageReceived-ra suskribitzen da, saioa hasi ondoren.
             this.form1.OnMessageReceived += Form1_OnMessageReceived;
         }
 
-        // Método que maneja los mensajes recibidos desde Form1
+        // Form1-tik jasotako nezuak kudeatzen ditu.
         private void Form1_OnMessageReceived(string mensaje)
         {
-            // Mostrar el mensaje solo si es sobre la unión de un cliente o un mensaje enviado en el chat
+            // Erakutsi mezua bezero bat sartzeari edo txatean bidalitako mezu bati buruzkoa bada soilik.
             richTextBox1.Invoke((MethodInvoker)(() =>
             {
-                // Solo mostrar si contiene "se ha unido" o un mensaje de chat
-                if (mensaje.Contains("se ha unido") || mensaje.Contains(":"))
+                // Erakutsi "sartu da" edo txat-mezu bat badu soilik.
+                if (mensaje.Contains("sartu da") || mensaje.Contains(":"))
                 {
                     richTextBox1.AppendText(mensaje + "\n");
                 }
             }));
         }
 
-
-        // Evento para enviar un mensaje cuando se presiona el botón
+        //Botoia klikatu eta jarraian mezua bidaliko da.
         private async void button1_Click_1(object sender, EventArgs e)
         {
             if (form1.erabiltzaileak.Count > 0)
             {
-                string izena = form1.erabiltzaileak[form1.erabiltzaileak.Count - 1]; // Último usuario agregado
+                string izena = form1.erabiltzaileak[form1.erabiltzaileak.Count - 1]; // Azken erabiltzailea.
                 string mensaje = $"{izena}: {richTextBox2.Text}";
 
                 try
                 {
-                    // Enviar el mensaje al servidor
+                    // Mezua zerbitzarira bidali.
                     await form1.sw.WriteLineAsync(mensaje);
 
-                    // Mostrar el mensaje en el propio chat
+                    // Txat-an mezua bistaratzen du.
                     richTextBox1.AppendText(mensaje + "\n");
 
-                    // Limpiar el contenido de richTextBox2
+                    // Mezua idazteko erabiltzen den testu hutsunea garbitzen du.
                     richTextBox2.Clear();
                 }
                 catch (Exception ex)
@@ -68,14 +64,11 @@ namespace PSP_E2T2
             }
         }
 
-
-        // Evento para regresar al Form1
+        // Saioa hasteko leihora bueltatzen du.
         private async void button2_Click(object sender, EventArgs e)
         {
-            // Mostrar form1
             form1.Show();
             this.Hide();
-
 
             bool connected = form1.getConnected();
             client = form1.GetClient();
@@ -86,11 +79,11 @@ namespace PSP_E2T2
             {
                 MessageBox.Show("Enviando mensaje de desconexión...", "Desconexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Enviar el mensaje de desconexión al servidor
+                // Zerbitzarira bezero hau deskonektatzeko eskatzen dio.
                 await sw.WriteLineAsync("ATERA");
                 await Task.Delay(100);
 
-                // Cerrar los streams y el cliente
+                // Eta konexioa kudeatzeko aldagaiak itzaltzen ditu.
                 sw.Close();
                 sr.Close();
                 client.Close();
@@ -101,14 +94,13 @@ namespace PSP_E2T2
             {
                 MessageBox.Show("No hay cliente conectado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
         }
 
         private void richTextBox2_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                e.SuppressKeyPress = true; // Bloquea el procesamiento de la tecla Enter
+                e.SuppressKeyPress = true;
             }
         }
 
@@ -116,8 +108,15 @@ namespace PSP_E2T2
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
-                e.Handled = true; // Anula el evento para evitar el salto de línea
+                e.Handled = true;
             }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Form3 form3 = new Form3();
+            form3.Show();
+            this.Hide();
         }
     }
 }

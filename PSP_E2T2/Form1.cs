@@ -7,49 +7,43 @@ namespace PSP_E2T2
 {
     public partial class Form1 : Form
     {
-        public List<string> erabiltzaileak = new List<string>();
-
-        public TcpClient client = null;
-
-        public NetworkStream str = null;
-
-        public StreamReader sr = null;
-        public StreamWriter sw = null;
-
-        private ProgramServer server;
-
-        private Form2 form2;
-
-        private bool isConnected = false;
-
-        public event Action<string> OnMessageReceived;
+        public List<string> erabiltzaileak = new List<string>(); // Erabiltzaileen zerrenda gordetzeko.
+        public TcpClient client = null; // Bezero TCP konektorea.
+        public NetworkStream str = null; // Datu-fluxua sare bidez bidaltzeko.
+        public StreamReader sr = null; // Datuak irakurtzeko.
+        public StreamWriter sw = null; // Datuak idazteko.
+        private ProgramServer server; // Zerbitzariaren erreferentzia, gero konektatu ahal izateko.
+        private Form2 form2; // Txataren leihoa.
+        private bool isConnected = false; // Konexio-egoera gordetzen du.
+        public event Action<string> OnMessageReceived; // Mezuak jasotzean ekintzak egiteko erabiliko den aldagaia.
 
         public Form1()
         {
             InitializeComponent();
-            erabiltzaileak = new List<string>();
+            erabiltzaileak = new List<string>(); // Erabiltzaileen zerrenda hasieratzen du.
         }
 
-        public bool getConnected() {
-            return isConnected;
+        public bool getConnected()
+        {
+            return isConnected; // Konexio-egoera itzultzen du.
         }
 
         public StreamReader getStreamReader()
         {
-            return sr;
+            return sr; // StreamReader objektua itzultzen du.
         }
 
         public StreamWriter getStreamWriter()
         {
-            return sw;
+            return sw; // StreamWriter objektua itzultzen du.
         }
 
         public TcpClient GetClient()
         {
-            return client;
+            return client; // TCP bezeroa itzultzen du.
         }
 
-        // Método para obtener la IP local del dispositivo
+        // Gailuaren tokiko IP helbidea lortzeko metodoa.
         private string GetLocalIPAddress()
         {
             string localIP = string.Empty;
@@ -68,28 +62,14 @@ namespace PSP_E2T2
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al obtener la IP: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Errorea IP lortzean: {ex.Message}", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             return localIP;
         }
 
-        public void AddErabiltzaile(string izena)
-        {
-            string ip = GetLocalIPAddress();
 
-            if (erabiltzaileak.Contains(izena))
-            {
-                MessageBox.Show("Izena hori beste erabiltzaile du. Ipini beste bat.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else if (!string.IsNullOrEmpty(izena))
-            {
-                erabiltzaileak.Add(izena);
-            }
-        }
-
-        // Método para recibir mensajes del servidor
-       
+        // Zerbitzariaren mezuei entzuteko metodoa.
         private async Task ListenForServerMessages()
         {
             try
@@ -97,29 +77,29 @@ namespace PSP_E2T2
                 string message;
                 while ((message = await sr.ReadLineAsync()) != null)
                 {
-                    // Dispara el evento cuando se recibe un mensaje
+                    // Mezu bat jasotzean ekitaldia aktibatzen du.
                     OnMessageReceived?.Invoke(message);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al recibir mensajes del servidor: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Errorea zerbitzariaren mezuak jasotzean: {ex.Message}", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // Llamar a este método en el `ConnectToServer` después de que el cliente se conecte
+        // Metodo hau deitu behar da bezeroa zerbitzarira konektatu ondoren.
         private async void ConnectToServer()
         {
             if (isConnected)
             {
-                MessageBox.Show("Ya estás conectado al servidor.", "Conexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Dagoeneko zerbitzarira konektatuta zaude.", "Konexioa", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             try
             {
-                // Configuración de conexión
-                string serverAddress = GetLocalIPAddress();
+                // Konexio-konfigurazioa.
+                string serverAddress = GetLocalIPAddress(); // Edo zerbitzariaren IP-a.
                 int serverPort = 13000;
 
                 client = new TcpClient();
@@ -129,53 +109,51 @@ namespace PSP_E2T2
                 sr = new StreamReader(str, Encoding.UTF8);
                 sw = new StreamWriter(str, Encoding.UTF8) { AutoFlush = true };
 
-                // Iniciar el proceso de escucha de mensajes del servidor
+                // Zerbitzariaren mezuei entzuteko prozesua hasten du.
                 _ = ListenForServerMessages();
 
                 isConnected = true;
-                MessageBox.Show("Conexión establecida con el servidor.", "Conexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Zerbitzariarekin konexioa ezarri da.", "Konexioa", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al conectar al servidor: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Errorea zerbitzarira konektatzean: {ex.Message}", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            // Solicitar el nombre del usuario
+            // Erabiltzailearen izena eskatzen du.
             string izena = Microsoft.VisualBasic.Interaction.InputBox("Sartu zure izena:", "Izena");
 
-            if (!string.IsNullOrEmpty(izena))
+            if (string.IsNullOrEmpty(izena))
             {
-                AddErabiltzaile(izena);
-                ConnectToServer(); // Intentar conectar al servidor
+                MessageBox.Show("Izena ezin da hutsik egon.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
-                // Mostrar el formulario Form2 después de agregar el usuario
-                if (form2 == null || form2.IsDisposed)
-                {
-                    form2 = new Form2(this); // Pasar Form1 como parámetro
-                    form2.Show();
-                }
-                else
-                {
-                    form2.Focus();
-                }
+            
+            ConnectToServer(); // Zerbitzarira konektatzen saiatzen da.
 
-                this.Hide(); // Ocultar el formulario actual
+            // Formulario berria irekitzen du erabiltzailea gehitu ondoren.
+            if (form2 == null || form2.IsDisposed)
+            {
+                form2 = new Form2(this); // Form1 parametro bezala pasatzen du.
+                form2.Show();
             }
             else
             {
-                MessageBox.Show("Izena ezin da hutsik egon.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                form2.Focus();
             }
-        }
 
+            this.Hide(); // Uneko leihoa ezkutatzen du, txat-aren leihoa irekiko duelako.
+        }
 
         private async void button2_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Programa amatatzen.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Programa amatatzen.", "Itxaron...", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            // Salir de la aplicación
+            // Aplikazioa ixten du.
             Application.Exit();
         }
     }
