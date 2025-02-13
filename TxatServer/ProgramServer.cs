@@ -36,7 +36,7 @@ namespace TxatServer
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error obteniendo la IP local: {ex.Message}");
+                Console.WriteLine($"Errorea IP lortzerakoan: {ex.Message}");
             }
 
             return IPAddress.Loopback; // Dirección de bucle local como respaldo
@@ -47,7 +47,7 @@ namespace TxatServer
             try
             {
                 this.server.Start();
-                Console.WriteLine($"Servidor de chat iniciado en {this.localAddr}:{this.port}. Esperando clientes...");
+                Console.WriteLine($"Zerbitzaria abiarazita {this.localAddr}:{this.port}. Bezeroak itxaroten...");
 
                 while (isRunning)
                 {
@@ -61,14 +61,14 @@ namespace TxatServer
                     var clientId = GetClientId(client);
 
                     clientesActivos[clientId] = client;
-                    Console.WriteLine($"Nuevo cliente conectado: {clientId}");
+                    Console.WriteLine($"Bezero berri bat konektatu da: {clientId}");
 
                     _ = HandleClientAsync(client, clientId); // Manejar cliente en un hilo separado
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error en el servidor: {ex.Message}");
+                Console.WriteLine($"Errorea zerbitzarian: {ex.Message}");
             }
         }
 
@@ -83,7 +83,7 @@ namespace TxatServer
 
               
                 // Solicitar el nombre de usuario al cliente
-                await writer.WriteLineAsync("Por favor, introduce tu nombre de usuario:");
+                await writer.WriteLineAsync("Mesedez, idatz ezazu izena:");
                 string nombreUsuario = await reader.ReadLineAsync();
 
                 // Verificar si hay 15 usuarios conectados
@@ -97,7 +97,7 @@ namespace TxatServer
                 // Verificar si el nombre de usuario ya está en uso
                 if (usuariosConectados.ContainsKey(nombreUsuario))
                 {
-                    await writer.WriteLineAsync("El nombre de usuario ya está en uso. Desconectando...");
+                    await writer.WriteLineAsync("izen hori jadanik erabileran dago. Deskonektatzen...");
                     client.Close();
                     return;
                 }
@@ -106,18 +106,18 @@ namespace TxatServer
                 usuariosConectados[nombreUsuario] = clientId;
                 clientesActivos[clientId] = client;
 
-                Console.WriteLine($"Nuevo cliente conectado: {nombreUsuario} ({clientId})");
-                await writer.WriteLineAsync($"Bienvenido al chat, {nombreUsuario}!");
+                Console.WriteLine($"Bezero berri bat konektatu da: {nombreUsuario} ({clientId})");
+                await writer.WriteLineAsync($"Ongi etorri txat-era, {nombreUsuario}!");
 
                 string message;
                 while ((message = await reader.ReadLineAsync()) != null)
                 {
-                    Console.WriteLine($"Mensaje recibido de {nombreUsuario}: {message}");
+                    Console.WriteLine($"{nombreUsuario}-ren mezu bat jaso da: {message}");
 
                     if (message.ToUpper() == "ATERA")
                     {
-                        Console.WriteLine($"Cliente {nombreUsuario} se ha desconectado.");
-                        await writer.WriteLineAsync($"Adiós, {nombreUsuario}!");
+                        Console.WriteLine($"{nombreUsuario} deskonektatu da");
+                        await writer.WriteLineAsync($"Agur, {nombreUsuario}!");
                         break;
                     }
 
@@ -128,11 +128,11 @@ namespace TxatServer
             }
             catch (IOException)
             {
-                Console.WriteLine($"El cliente {clientId} cerró la conexión.");
+                Console.WriteLine($"{clientId} konexioa itxi du.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error con cliente {clientId}: {ex.Message}");
+                Console.WriteLine($"Bezeroaren errorea: {clientId}: {ex.Message}");
             }
             finally
             {
@@ -140,7 +140,7 @@ namespace TxatServer
                 clientesActivos.TryRemove(clientId, out _);
                 usuariosConectados.TryRemove(clientId, out _);
                 client.Close();
-                Console.WriteLine($"Cliente desconectado: {clientId}");
+                Console.WriteLine($"{clientId} deskonektatuta");
             }
         }
 
@@ -160,7 +160,7 @@ namespace TxatServer
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error al enviar mensaje a cliente: {ex.Message}");
+                    Console.WriteLine($"Errorea mezua bidaltzerakoan: {ex.Message}");
                 }
             }
         }
@@ -177,7 +177,7 @@ namespace TxatServer
                 kvp.Value.Close();
 
             this.server.Stop();
-            Console.WriteLine("Servidor detenido.");
+            Console.WriteLine("Zerbitzaria geldituta.");
         }
 
         public static async Task Main(string[] args)

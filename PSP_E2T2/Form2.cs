@@ -30,7 +30,7 @@ namespace PSP_E2T2
             richTextBox1.Invoke((MethodInvoker)(() =>
             {
                 // Solo mostrar si contiene "se ha unido" o un mensaje de chat
-                if (mensaje.Contains("se ha unido") || mensaje.Contains(":"))
+                if (mensaje.Contains("batu da") || mensaje.Contains(":"))
                 {
                     richTextBox1.AppendText(mensaje + "\n");
                 }
@@ -56,12 +56,12 @@ namespace PSP_E2T2
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al enviar el mensaje: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Ezin izan da mezua bidali: {ex.Message}", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else
             {
-                MessageBox.Show("No hay usuarios registrados para enviar mensajes.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Ezin da mezurik bidali ez dagoelako beste pertsonarik.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -81,7 +81,7 @@ namespace PSP_E2T2
 
             if (client != null && connected)
             {
-                MessageBox.Show("Enviando mensaje de desconexión...", "Desconexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Deskonexio mezua bidaltzen...", "Deskonexioa", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 // Enviar el mensaje de desconexión al servidor
                 await sw.WriteLineAsync("ATERA");
@@ -92,11 +92,11 @@ namespace PSP_E2T2
                 sr.Close();
                 client.Close();
 
-                MessageBox.Show("Cliente desconectado.", "Desconexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Bezeroa deskonektatuta.", "Desconexioa", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                MessageBox.Show("No hay cliente conectado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Ez dago bezero konektaturik.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }

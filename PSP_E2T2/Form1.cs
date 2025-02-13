@@ -69,7 +69,7 @@ namespace PSP_E2T2
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al obtener la IP: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"IP-a lortzerakoan errorea bat gertatu da: {ex.Message}", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             return localIP;
@@ -81,7 +81,7 @@ namespace PSP_E2T2
 
             if (erabiltzaileak.Contains(izena))
             {
-                MessageBox.Show("Izena hori beste erabiltzaile du. Ipini beste bat.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Izen hori beste erabiltzaile du. Ipini beste bat.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else if (!string.IsNullOrEmpty(izena))
             {
@@ -104,7 +104,7 @@ namespace PSP_E2T2
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al recibir mensajes del servidor: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Zerbitzariaren mezuak lortzerakoan errore bat gertatu da: {ex.Message}", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -128,7 +128,7 @@ namespace PSP_E2T2
         {
             if (isConnected)
             {
-                MessageBox.Show("Ya estás conectado al servidor.", "Conexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Jadanik zerbitzarira konektatuta zaude.", "Konexioa", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -146,29 +146,29 @@ namespace PSP_E2T2
 
                 // Esperar a que el servidor solicite el nombre de usuario
                 string serverMessage = await sr.ReadLineAsync();
-                if (serverMessage == "Por favor, introduce tu nombre de usuario:")
+                if (serverMessage == "Mesedez, erabiltzaile izena jarri:")
                 {
                     // Enviar el nombre de usuario al servidor
                     await sw.WriteLineAsync(erabiltzaileak.Last());
 
                     // Leer la respuesta del servidor
                     string response = await sr.ReadLineAsync();
-                    if (response == "El nombre de usuario ya está en uso. Desconectando...")
+                    if (response == "Erabiltzaile izen hori erabileran dago. Deskonektatzen...")
                     {
-                        MessageBox.Show("El nombre de usuario ya está en uso. Por favor, elige otro.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Izen hori jadanik erabileran dago.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         client.Close();
                         return; // No mostrar el Form2 si el nombre ya está en uso
                     }
                     else if (response == "SERVER_FULL")
                     {
-                        MessageBox.Show("El servidor está lleno. Inténtalo de nuevo más tarde.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Zerbitzaria beteta dago.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         client.Close();
                         return; // No mostrar el Form2 si el servidor está lleno
                     }
-                    else if (response.StartsWith("Bienvenido al chat,"))
+                    else if (response.StartsWith("Ongi etorri txatera."))
                     {
                         isConnected = true;
-                        MessageBox.Show("Conexión establecida con el servidor.", "Conexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Zerbitzarira konektatuta.", "Conexioa", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                         // Iniciar el proceso de escucha de mensajes del servidor
                         _ = ListenForServerMessages();
@@ -191,15 +191,15 @@ namespace PSP_E2T2
             catch (IOException)
             {
                 // Captura la excepción cuando el servidor cierra la conexión abruptamente
-                MessageBox.Show("El servidor está lleno o la conexión se interrumpió. Inténtalo de nuevo más tarde.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Zerbitzaria beteta dago edo konexioa galdu da. Berriz saiatu.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (SocketException)
             {
-                MessageBox.Show("No se pudo conectar al servidor. Asegúrate de que el servidor esté en ejecución.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Ezin izan da zerbitzarira konektatu. Beharbada ez dago abiarazita.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al conectar al servidor: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ezin izan da zerbitzarira konektatu: {ex.Message}", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

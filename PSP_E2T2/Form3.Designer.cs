@@ -47,7 +47,7 @@
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 1;
-            button1.Text = "button1";
+            button1.Text = "Kontsultatu";
             button1.UseVisualStyleBackColor = true;
             // 
             // dataGridView1
