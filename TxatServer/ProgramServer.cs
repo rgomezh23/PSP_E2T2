@@ -81,9 +81,18 @@ namespace TxatServer
                 using var reader = new StreamReader(stream, Encoding.UTF8);
                 using var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
 
+              
                 // Solicitar el nombre de usuario al cliente
                 await writer.WriteLineAsync("Por favor, introduce tu nombre de usuario:");
                 string nombreUsuario = await reader.ReadLineAsync();
+
+                // Verificar si hay 15 usuarios conectados
+                if (clientesActivos.Count >= 15)
+                {
+                    await writer.WriteLineAsync("SERVER_FULL"); // Mensaje claro para el cliente
+                    client.Close();
+                    return;
+                }
 
                 // Verificar si el nombre de usuario ya está en uso
                 if (usuariosConectados.ContainsKey(nombreUsuario))

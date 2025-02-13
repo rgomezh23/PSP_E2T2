@@ -159,6 +159,12 @@ namespace PSP_E2T2
                         client.Close();
                         return; // No mostrar el Form2 si el nombre ya está en uso
                     }
+                    else if (response == "SERVER_FULL")
+                    {
+                        MessageBox.Show("El servidor está lleno. Inténtalo de nuevo más tarde.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        client.Close();
+                        return; // No mostrar el Form2 si el servidor está lleno
+                    }
                     else if (response.StartsWith("Bienvenido al chat,"))
                     {
                         isConnected = true;
@@ -182,12 +188,20 @@ namespace PSP_E2T2
                     }
                 }
             }
+            catch (IOException)
+            {
+                // Captura la excepción cuando el servidor cierra la conexión abruptamente
+                MessageBox.Show("El servidor está lleno o la conexión se interrumpió. Inténtalo de nuevo más tarde.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (SocketException)
+            {
+                MessageBox.Show("No se pudo conectar al servidor. Asegúrate de que el servidor esté en ejecución.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error al conectar al servidor: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
         private async void button2_Click(object sender, EventArgs e)
         {
