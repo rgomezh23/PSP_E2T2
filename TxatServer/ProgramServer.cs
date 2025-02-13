@@ -14,6 +14,8 @@ namespace TxatServer
         private bool isRunning = true; // Control del bucle del servidor
         public event Action<string> OnNewMessageReceived;
 
+        private ConcurrentDictionary<string, string> usuariosConectados = new ConcurrentDictionary<string, string>();
+
         public ProgramServer()
         {
             // Obtener la dirección IP local del servidor
@@ -77,30 +79,42 @@ namespace TxatServer
             {
                 using var stream = client.GetStream();
                 using var reader = new StreamReader(stream, Encoding.UTF8);
-                var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
+                using var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
 
-                // Enviar mensaje de bienvenida al cliente
-                await writer.WriteLineAsync("Bienvenido al chat!");
+                // Solicitar el nombre de usuario al cliente
+                await writer.WriteLineAsync("Por favor, introduce tu nombre de usuario:");
+                string nombreUsuario = await reader.ReadLineAsync();
+
+                // Verificar si el nombre de usuario ya está en uso
+                if (usuariosConectados.ContainsKey(nombreUsuario))
+                {
+                    await writer.WriteLineAsync("El nombre de usuario ya está en uso. Desconectando...");
+                    client.Close();
+                    return;
+                }
+
+                // Agregar el nombre de usuario a la lista de usuarios conectados
+                usuariosConectados[nombreUsuario] = clientId;
+                clientesActivos[clientId] = client;
+
+                Console.WriteLine($"Nuevo cliente conectado: {nombreUsuario} ({clientId})");
+                await writer.WriteLineAsync($"Bienvenido al chat, {nombreUsuario}!");
 
                 string message;
-                // Leer mensajes del cliente
                 while ((message = await reader.ReadLineAsync()) != null)
                 {
-                    Console.WriteLine($"Mensaje recibido de {clientId}: {message}");
+                    Console.WriteLine($"Mensaje recibido de {nombreUsuario}: {message}");
 
-                    // Si el mensaje es "ATERA", desconectar el cliente
                     if (message.ToUpper() == "ATERA")
                     {
-                        Console.WriteLine($"Cliente {clientId} se ha desconectado.");
-                        await writer.WriteLineAsync($"Cliente {clientId} se ha desconectado.");
+                        Console.WriteLine($"Cliente {nombreUsuario} se ha desconectado.");
+                        await writer.WriteLineAsync($"Adiós, {nombreUsuario}!");
                         break;
                     }
 
-                    // Broadcast del mensaje a todos los clientes conectados excepto al que lo envió
-                    await BroadcastMessageToAllClients(clientId, $"{message}");
-
-                    // Dispara el evento para enviar el mensaje a Form2 (cliente)
-                    OnNewMessageReceived?.Invoke($"{clientId}: {message}");
+                    // Enviar el mensaje con el formato "nombreUsuario: mensaje"
+                    await BroadcastMessageToAllClients(nombreUsuario, message);
+                    OnNewMessageReceived?.Invoke($"{nombreUsuario}: {message}");
                 }
             }
             catch (IOException)
@@ -115,6 +129,7 @@ namespace TxatServer
             {
                 // Eliminar cliente de la lista
                 clientesActivos.TryRemove(clientId, out _);
+                usuariosConectados.TryRemove(clientId, out _);
                 client.Close();
                 Console.WriteLine($"Cliente desconectado: {clientId}");
             }

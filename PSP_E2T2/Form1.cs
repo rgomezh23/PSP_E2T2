@@ -108,7 +108,22 @@ namespace PSP_E2T2
             }
         }
 
-        // Llamar a este método en el `ConnectToServer` después de que el cliente se conecte
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            // Solicitar el nombre del usuario
+            string izena = Microsoft.VisualBasic.Interaction.InputBox("Sartu zure izena:", "Izena");
+
+            if (!string.IsNullOrEmpty(izena))
+            {
+                AddErabiltzaile(izena);
+                ConnectToServer(); // Intentar conectar al servidor
+            }
+            else
+            {
+                MessageBox.Show("Izena ezin da hutsik egon.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private async void ConnectToServer()
         {
             if (isConnected)
@@ -119,7 +134,6 @@ namespace PSP_E2T2
 
             try
             {
-                // Configuración de conexión
                 string serverAddress = GetLocalIPAddress();
                 int serverPort = 13000;
 
@@ -130,44 +144,47 @@ namespace PSP_E2T2
                 sr = new StreamReader(str, Encoding.UTF8);
                 sw = new StreamWriter(str, Encoding.UTF8) { AutoFlush = true };
 
-                // Iniciar el proceso de escucha de mensajes del servidor
-                _ = ListenForServerMessages();
+                // Esperar a que el servidor solicite el nombre de usuario
+                string serverMessage = await sr.ReadLineAsync();
+                if (serverMessage == "Por favor, introduce tu nombre de usuario:")
+                {
+                    // Enviar el nombre de usuario al servidor
+                    await sw.WriteLineAsync(erabiltzaileak.Last());
 
-                isConnected = true;
-                MessageBox.Show("Conexión establecida con el servidor.", "Conexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Leer la respuesta del servidor
+                    string response = await sr.ReadLineAsync();
+                    if (response == "El nombre de usuario ya está en uso. Desconectando...")
+                    {
+                        MessageBox.Show("El nombre de usuario ya está en uso. Por favor, elige otro.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        client.Close();
+                        return; // No mostrar el Form2 si el nombre ya está en uso
+                    }
+                    else if (response.StartsWith("Bienvenido al chat,"))
+                    {
+                        isConnected = true;
+                        MessageBox.Show("Conexión establecida con el servidor.", "Conexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        // Iniciar el proceso de escucha de mensajes del servidor
+                        _ = ListenForServerMessages();
+
+                        // Mostrar el formulario Form2 después de una conexión exitosa
+                        if (form2 == null || form2.IsDisposed)
+                        {
+                            form2 = new Form2(this); // Pasar Form1 como parámetro
+                            form2.Show();
+                        }
+                        else
+                        {
+                            form2.Focus();
+                        }
+
+                        this.Hide(); // Ocultar el formulario actual
+                    }
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error al conectar al servidor: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private async void button1_Click(object sender, EventArgs e)
-        {
-            // Solicitar el nombre del usuario
-            string izena = Microsoft.VisualBasic.Interaction.InputBox("Sartu zure izena:", "Izena");
-
-            if (!string.IsNullOrEmpty(izena))
-            {
-                AddErabiltzaile(izena);
-                ConnectToServer(); // Intentar conectar al servidor
-
-                // Mostrar el formulario Form2 después de agregar el usuario
-                if (form2 == null || form2.IsDisposed)
-                {
-                    form2 = new Form2(this); // Pasar Form1 como parámetro
-                    form2.Show();
-                }
-                else
-                {
-                    form2.Focus();
-                }
-
-                this.Hide(); // Ocultar el formulario actual
-            }
-            else
-            {
-                MessageBox.Show("Izena ezin da hutsik egon.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

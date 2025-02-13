@@ -51,9 +51,6 @@ namespace PSP_E2T2
                     // Enviar el mensaje al servidor
                     await form1.sw.WriteLineAsync(mensaje);
 
-                    // Mostrar el mensaje en el propio chat
-                    richTextBox1.AppendText(mensaje + "\n");
-
                     // Limpiar el contenido de richTextBox2
                     richTextBox2.Clear();
                 }
