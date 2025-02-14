@@ -81,7 +81,7 @@ namespace TxatServer
                 using var reader = new StreamReader(stream, Encoding.UTF8);
                 using var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
 
-              
+
                 // Solicitar el nombre de usuario al cliente
                 await writer.WriteLineAsync("Mesedez, sartu zure erabiltzaile izena:");
                 string nombreUsuario = await reader.ReadLineAsync();

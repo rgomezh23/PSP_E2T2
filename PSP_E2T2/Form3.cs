@@ -55,6 +55,11 @@ namespace PSP_E2T2
                 MessageBox.Show($"Errorea datuak eskuratzean: {ex.Message}", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void Form3_Load(object sender, EventArgs e)
+        {
+            this.BackColor = ColorTranslator.FromHtml("#1C345C");
+        }
     }
 
     // Appointment klasea definitzen da, API erantzunaren datuak gordetzeko

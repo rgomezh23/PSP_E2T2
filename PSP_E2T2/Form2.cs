@@ -118,5 +118,10 @@ namespace PSP_E2T2
             form3.Show();
             this.Hide();
         }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+            this.BackColor = ColorTranslator.FromHtml("#1C345C");
+        }
     }
 }

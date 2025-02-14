@@ -43,17 +43,18 @@
             // 
             // button1
             // 
-            button1.Location = new Point(546, 45);
+            button1.Location = new Point(696, 45);
             button1.Name = "button1";
-            button1.Size = new Size(75, 23);
+            button1.Size = new Size(92, 23);
             button1.TabIndex = 1;
             button1.Text = "Kontsultatu";
             button1.UseVisualStyleBackColor = true;
             // 
             // dataGridView1
             // 
+            dataGridView1.BackgroundColor = SystemColors.ControlLightLight;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(12, 117);
+            dataGridView1.Location = new Point(28, 103);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.Size = new Size(760, 321);
             dataGridView1.TabIndex = 2;
@@ -62,12 +63,13 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(818, 450);
             Controls.Add(dataGridView1);
             Controls.Add(button1);
             Controls.Add(dateTimePicker1);
             Name = "Form3";
-            Text = "Form3";
+            Text = "Kontsultatu";
+            Load += Form3_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
         }
