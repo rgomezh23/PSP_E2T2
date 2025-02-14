@@ -13,66 +13,62 @@ namespace PSP_E2T2
         public StreamReader sr = null;
         public StreamWriter sw = null;
 
-
         public Form2(Form1 form1)
         {
             InitializeComponent();
             this.form1 = form1;
 
-            // Suscribirse al evento OnMessageReceived de Form1
+            // Form1-eko OnMessageReceived gertaerara harpidetu
             this.form1.OnMessageReceived += Form1_OnMessageReceived;
         }
 
-        // Método que maneja los mensajes recibidos desde Form1
+        // Form1-etik jasotako mezuak kudeatzen dituen metodoa
         private void Form1_OnMessageReceived(string mensaje)
         {
-            // Mostrar el mensaje solo si es sobre la unión de un cliente o un mensaje enviado en el chat
+            // Mezua erakutsi bezero bat batu den edo txat mezu bat den kasuetan bakarrik
             richTextBox1.Invoke((MethodInvoker)(() =>
             {
-                // Solo mostrar si contiene "se ha unido" o un mensaje de chat
-                if (mensaje.Contains("se ha unido") || mensaje.Contains(":"))
+                // Erakutsi soilik "sartu da" edo ":" duten mezuak
+                if (mensaje.Contains("sartu da") || mensaje.Contains(":"))
                 {
                     richTextBox1.AppendText(mensaje + "\n");
                 }
             }));
         }
 
-
-        // Evento para enviar un mensaje cuando se presiona el botón
+        // Botoia sakatzean mezua bidaltzeko gertaera
         private async void button1_Click_1(object sender, EventArgs e)
         {
             if (form1.erabiltzaileak.Count > 0)
             {
-                string izena = form1.erabiltzaileak[form1.erabiltzaileak.Count - 1]; // Último usuario agregado
+                string izena = form1.erabiltzaileak[form1.erabiltzaileak.Count - 1]; // Azken gehitutako erabiltzailea
                 string mensaje = $"{izena}: {richTextBox2.Text}";
 
                 try
                 {
-                    // Enviar el mensaje al servidor
+                    // Mezua zerbitzarira bidali
                     await form1.sw.WriteLineAsync(mensaje);
 
-                    // Limpiar el contenido de richTextBox2
+                    // richTextBox2 edukia garbitu
                     richTextBox2.Clear();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al enviar el mensaje: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Errorea mezua bidaltzean: {ex.Message}", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else
             {
-                MessageBox.Show("No hay usuarios registrados para enviar mensajes.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Ez dago erregistratutako erabiltzailearik mezuak bidaltzeko.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
-
-        // Evento para regresar al Form1
+        // Form1-era itzultzeko gertaera
         private async void button2_Click(object sender, EventArgs e)
         {
-            // Mostrar form1
+            // Form1 erakutsi
             form1.Show();
             this.Hide();
-
 
             bool connected = form1.getConnected();
             client = form1.GetClient();
@@ -81,31 +77,30 @@ namespace PSP_E2T2
 
             if (client != null && connected)
             {
-                MessageBox.Show("Enviando mensaje de desconexión...", "Desconexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Deskonektatzeko mezua bidaltzen...", "Deskonektatzea", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Enviar el mensaje de desconexión al servidor
+                // Deskonektatzeko mezua zerbitzarira bidali
                 await sw.WriteLineAsync("ATERA");
                 await Task.Delay(100);
 
-                // Cerrar los streams y el cliente
+                // Streamak eta bezeroa itxi
                 sw.Close();
                 sr.Close();
                 client.Close();
 
-                MessageBox.Show("Cliente desconectado.", "Desconexión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Bezeroa deskonektatu da.", "Deskonektatzea", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                MessageBox.Show("No hay cliente conectado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Ez dago konektatutako bezerorik.", "Errorea", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
         }
 
         private void richTextBox2_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                e.SuppressKeyPress = true; // Bloquea el procesamiento de la tecla Enter
+                e.SuppressKeyPress = true; // Enter teklaren prozesatzea blokeatu
             }
         }
 
@@ -113,7 +108,7 @@ namespace PSP_E2T2
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
-                e.Handled = true; // Anula el evento para evitar el salto de línea
+                e.Handled = true; // Gertaera baliogabetu lerro-jauzia ekiditeko
             }
         }
 

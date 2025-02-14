@@ -42,9 +42,9 @@
             label1.Font = new Font("Segoe UI", 48F);
             label1.Location = new Point(298, -12);
             label1.Name = "label1";
-            label1.Size = new Size(168, 86);
+            label1.Size = new Size(149, 86);
             label1.TabIndex = 0;
-            label1.Text = "Chat";
+            label1.Text = "Txat";
             // 
             // richTextBox1
             // 
@@ -62,7 +62,7 @@
             button1.Name = "button1";
             button1.Size = new Size(128, 41);
             button1.TabIndex = 2;
-            button1.Text = "Textua bidali";
+            button1.Text = "Testua bidali";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click_1;
             // 
@@ -93,7 +93,7 @@
             button3.Name = "button3";
             button3.Size = new Size(75, 23);
             button3.TabIndex = 5;
-            button3.Text = "button3";
+            button3.Text = "Kontsultatu";
             button3.UseVisualStyleBackColor = true;
             button3.Click += button3_Click;
             // 

@@ -83,7 +83,7 @@ namespace TxatServer
 
               
                 // Solicitar el nombre de usuario al cliente
-                await writer.WriteLineAsync("Por favor, introduce tu nombre de usuario:");
+                await writer.WriteLineAsync("Mesedez, sartu zure erabiltzaile izena:");
                 string nombreUsuario = await reader.ReadLineAsync();
 
                 // Verificar si hay 15 usuarios conectados
@@ -97,7 +97,7 @@ namespace TxatServer
                 // Verificar si el nombre de usuario ya está en uso
                 if (usuariosConectados.ContainsKey(nombreUsuario))
                 {
-                    await writer.WriteLineAsync("El nombre de usuario ya está en uso. Desconectando...");
+                    await writer.WriteLineAsync("Erabiltzaile izena dagoeneko erabilia dago. Deskonektatzen...");
                     client.Close();
                     return;
                 }
