@@ -16,8 +16,6 @@ namespace PSP_E2T2
         public StreamReader sr = null;
         public StreamWriter sw = null;
 
-        private ProgramServer server;
-
         private Form2 form2;
 
         private bool isConnected = false;
